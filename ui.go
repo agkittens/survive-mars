@@ -30,7 +30,7 @@ func (b *Button) Update() {
 func (b *Button) Draw(screen *ebiten.Image) {
 	CreateRect(b.x, b.y, 1, 1, screen, b.image)
 	textX := WIDTH/2 - len(b.text)*6
-	textY := b.y + b.image.Bounds().Dy()/3
+	textY := b.y + b.image.Bounds().Dy()/4
 	DisplayText(textX, textY, 24, b.text, screen, color.White)
 }
 

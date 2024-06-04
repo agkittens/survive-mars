@@ -64,8 +64,15 @@ func (w *Window) Init() {
 	w.buttons = append(w.buttons, startButton, exitButton, leftButton, rightButton)
 
 	city := &City{
-		bg: cityImg,
+		bg:              cityImg,
+		water:           100,
+		food:            100,
+		oxygen:          100,
+		power:           100,
+		qualityOfLiving: 100,
 	}
+	city.Init()
+
 	gardens := &Gardens{
 		bg: gardensImg,
 	}
@@ -90,6 +97,9 @@ func (w *Window) Update() error {
 		w.buttons[3].onClick = func() { currentState = StateTransportation }
 		w.buttons[2].Update()
 		w.buttons[3].Update()
+		if city, ok := w.gameLogic[0].(*City); ok {
+			city.UpdateResources()
+		}
 
 	case StateGardens:
 		w.buttons[3].onClick = func() { currentState = StateCity }
