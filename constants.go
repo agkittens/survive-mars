@@ -15,7 +15,8 @@ const TRANSPORTATION = "interface/assets/transportation.jpg"
 const BUTTON1 = "interface/assets/Icons/Arrows.png"
 const BUTTON2 = "interface/assets/Icons/ArrowsLeft2.png"
 const BUTTON3 = "interface/assets/Icons/ArrowsRight2.png"
-const BUTTON4 = "interface/assets/in use/BtnDefault.png"
+const BUTTON4 = "interface/assets/in use/Button Hover.png"
+const BUTTON5 = "interface/assets/in use/Button Active.png"
 
 // resources icons
 const ICON1 = "interface/assets/in use/IconD07.png"
@@ -34,6 +35,13 @@ const ICON11 = "interface/assets/in use/IconD03.png"
 const ICON12 = "interface/assets/in use/IconD05.png"
 
 const ICON13 = "interface/assets/in use/Icon28.png"
+
+// log
+const LOG_WINDOW = "interface/assets/in use/Card X2.png"
+
+// dashboards
+const DASHBOARD1 = "interface/assets/in use/Card X3.png"
+const DASHBOARD2 = "interface/assets/in use/Card X1.png"
 
 // window
 const (
