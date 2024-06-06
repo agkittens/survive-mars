@@ -1,10 +1,7 @@
 package main
 
 import (
-	"image"
 	"image/color"
-	"log"
-	"os"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -25,11 +22,16 @@ type City struct {
 	operatorStatus                                           bool
 	logs                                                     []string
 	isLogShowed, isDashbShowed                               bool
+	currentResource                                          string
+	currentResourceIdx                                       int
+	resourceDescription                                      []string
+	resourceDescriptionIdx                                   int
 }
 
 func (c *City) Init() {
 	c.LoadImgs()
 	c.CreateButtons()
+	c.GetResourceDescription()
 	c.operatorStatus = true
 	c.isDashbShowed = false
 }
@@ -158,13 +160,23 @@ func (c *City) CheckOperator() {
 }
 
 func (c *City) ShowDashboards(screen *ebiten.Image) {
-	log.Print(c.isDashbShowed)
 	if c.isDashbShowed {
 		opBG := AdjustSize(c.bg, 2, 2)
 		screen.DrawImage(c.bg, opBG)
 		c.windows[1].Draw(screen)
 		c.windows[2].Draw(screen)
 		c.windows[3].Draw(screen)
+
+		DisplayText(c.windows[1].x+c.windows[1].image.Bounds().Dx()/2-len(c.currentResource)*9, c.windows[1].y+60, 36, c.currentResource, screen, color.White)
+
+		xPos := c.windows[1].x + 5 + (c.imgs[16].Bounds().Dx()-c.imgs[c.currentResourceIdx].Bounds().Dx())/2
+		PlaceImg(xPos, 370, c.imgs[c.currentResourceIdx], screen)
+
+		text := WrapText(c.resourceDescription[c.resourceDescriptionIdx], 35)
+		for i, word := range text {
+			y := c.windows[1].y + 100 + (i+1)*16
+			DisplayText(xPos, y+32, 16, word, screen, color.White)
+		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 			c.isDashbShowed = false
@@ -208,28 +220,51 @@ func (c *City) UpdateLogs(resource, status string) {
 
 func (c *City) CreateButtons() {
 	waterIcon := &Button{
-		image:   c.imgs[0],
-		x:       50,
-		y:       20,
-		onClick: func() { c.isDashbShowed = true },
+		image: c.imgs[0],
+		x:     50,
+		y:     20,
+		onClick: func() {
+			c.isDashbShowed = true
+			c.currentResource = "water"
+			c.currentResourceIdx = 18
+			c.resourceDescriptionIdx = 0
+		},
 	}
 	foodIcon := &Button{
-		image:   c.imgs[1],
-		x:       150,
-		y:       20,
-		onClick: func() { c.isDashbShowed = true },
+		image: c.imgs[1],
+		x:     150,
+		y:     20,
+		onClick: func() {
+			c.isDashbShowed = true
+			c.currentResource = "food"
+			c.currentResourceIdx = 19
+			c.resourceDescriptionIdx = 1
+
+		},
 	}
 	oxygenIcon := &Button{
-		image:   c.imgs[2],
-		x:       250,
-		y:       20,
-		onClick: func() { c.isDashbShowed = true },
+		image: c.imgs[2],
+		x:     250,
+		y:     20,
+		onClick: func() {
+			c.isDashbShowed = true
+			c.currentResource = "oxygen"
+			c.currentResourceIdx = 20
+			c.resourceDescriptionIdx = 2
+
+		},
 	}
 	powerIcon := &Button{
-		image:   c.imgs[3],
-		x:       350,
-		y:       20,
-		onClick: func() { c.isDashbShowed = true },
+		image: c.imgs[3],
+		x:     350,
+		y:     20,
+		onClick: func() {
+			c.isDashbShowed = true
+			c.currentResource = "power"
+			c.currentResourceIdx = 21
+			c.resourceDescriptionIdx = 3
+
+		},
 	}
 
 	operatorIcon := &Button{
@@ -306,28 +341,35 @@ func (c *City) LoadImgs() {
 	operatorImg, _, _ := ebitenutil.NewImageFromFile(ICON13)
 
 	// buttons
-	openedFile, _ := os.Open(BUTTON4)
-	img, _, _ := image.Decode(openedFile)
-	logImg := ResizeImg(img, 260, 52)
-
-	openedFile, _ = os.Open(BUTTON5)
-	img, _, _ = image.Decode(openedFile)
-	logImg2 := ResizeImg(img, 260, 52)
+	logImg := ResizeImg(BUTTON4, 260, 52)
+	logImg2 := ResizeImg(BUTTON5, 260, 52)
 
 	// log window
 	logWindowImg, _, _ := ebitenutil.NewImageFromFile(LOG_WINDOW)
 
 	// dashboards
 	dashboardImg1, _, _ := ebitenutil.NewImageFromFile(DASHBOARD1)
+	dashboardImg2 := ResizeImg(DASHBOARD2, 405, 750)
 
-	openedFile, _ = os.Open(DASHBOARD2)
-	img, _, _ = image.Decode(openedFile)
-	dashboardImg2 := ResizeImg(img, 405, 750)
+	// resources imgs
+	resourceImg1 := ResizeImg(IMG1, 300, 300)
+	resourceImg2 := ResizeImg(IMG2, 300, 300)
+	resourceImg3 := ResizeImg(IMG3, 300, 300)
+	resourceImg4 := ResizeImg(IMG4, 300, 300)
 
 	c.imgs = append(c.imgs,
 		waterImgG, foodImgG, oxygenImgG, powerImgG,
 		waterImgO, foodImgO, oxygenImgO, powerImgO,
 		waterImgB, foodImgB, oxygenImgB, powerImgB,
 		operatorImg, logImg, logImg2, logWindowImg,
-		dashboardImg1, dashboardImg2)
+		dashboardImg1, dashboardImg2,
+		resourceImg1, resourceImg2, resourceImg3, resourceImg4)
+}
+
+func (c *City) GetResourceDescription() {
+	waterD := "Water is crucial for the survival of the Mars colony. It is needed for drinking, growing crops, and maintaining hygiene. Water can be extracted from underground ice deposits or transported from Earth. Efficient recycling systems are also vital to ensure a sustainable water supply."
+	foodD := "Food provides the necessary nutrients and energy for the colonists. It can be cultivated in hydroponic farms using Martian soil and water, or delivered from Earth. Developing a self-sufficient food production system is key to the colony's long-term viability."
+	oxygenD := "Oxygen is essential for breathing and maintaining life support systems. It can be generated by splitting water molecules through electrolysis or produced by algae in bioreactors. Ensuring a continuous supply of oxygen is critical for the health and safety of all colonists."
+	powerD := "Power is needed to run all the colony's systems, including life support, heating, lighting, and machinery. It can be generated from solar panels, nuclear reactors, or other renewable sources. Reliable and efficient power generation is fundamental to the colony's operation and growth."
+	c.resourceDescription = append(c.resourceDescription, waterD, foodD, oxygenD, powerD)
 }

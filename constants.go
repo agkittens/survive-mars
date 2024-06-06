@@ -36,6 +36,12 @@ const ICON12 = "interface/assets/in use/IconD05.png"
 
 const ICON13 = "interface/assets/in use/Icon28.png"
 
+// resources imgs
+const IMG1 = "interface/assets/in use/water.jpg"
+const IMG2 = "interface/assets/in use/food.jpg"
+const IMG3 = "interface/assets/in use/oxygen.jpg"
+const IMG4 = "interface/assets/in use/reactor.jpg"
+
 // log
 const LOG_WINDOW = "interface/assets/in use/Card X2.png"
 
@@ -52,3 +58,6 @@ const (
 	StateTransportation
 	StateExit
 )
+
+// data json
+const JSONPATH = "data/resource.json"
