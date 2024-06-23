@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"time"
 
@@ -15,6 +16,7 @@ type Game interface {
 type City struct {
 	bg                                                       *ebiten.Image
 	food, water, oxygen, power                               float32
+	resources                                                []float32
 	qualityOfLiving                                          float32
 	icons, buttons, windows                                  []*Button
 	imgs                                                     []*ebiten.Image
@@ -34,6 +36,9 @@ func (c *City) Init() {
 	c.GetResourceDescription()
 	c.operatorStatus = true
 	c.isDashbShowed = false
+	c.qualityOfLiving = 100
+	c.resources = append(c.resources, c.water, c.food, c.oxygen, c.power)
+	c.resourceDescriptionIdx = 0
 }
 
 func (c *City) Draw(screen *ebiten.Image) {
@@ -48,12 +53,10 @@ func (c *City) Draw(screen *ebiten.Image) {
 
 	}
 
-	for i := 0; i < len(c.buttons); i++ {
-		c.buttons[i].Draw(screen)
-	}
+	c.buttons[0].Draw(screen)
 
 	if !c.operatorStatus {
-		c.icons[4].Draw(screen)
+		c.icons[5].Draw(screen)
 	}
 
 	c.ShowLogs(screen)
@@ -65,33 +68,33 @@ func (c *City) ManageResources() {
 }
 
 func (c *City) MonitorResources() {
-	if c.water >= 75 {
+	if c.resources[0] >= 75 {
 		c.icons[0].image = c.imgs[0]
-	} else if c.water >= 40 {
+	} else if c.resources[0] >= 40 {
 		c.icons[0].image = c.imgs[4]
 	} else {
 		c.icons[0].image = c.imgs[8]
 	}
 
-	if c.food >= 75 {
+	if c.resources[1] >= 75 {
 		c.icons[1].image = c.imgs[1]
-	} else if c.food >= 25 {
+	} else if c.resources[1] >= 25 {
 		c.icons[1].image = c.imgs[5]
 	} else {
 		c.icons[1].image = c.imgs[9]
 	}
 
-	if c.oxygen >= 75 {
+	if c.resources[2] >= 75 {
 		c.icons[2].image = c.imgs[2]
-	} else if c.oxygen >= 50 {
+	} else if c.resources[2] >= 50 {
 		c.icons[2].image = c.imgs[6]
 	} else {
 		c.icons[2].image = c.imgs[10]
 	}
 
-	if c.power >= 75 {
+	if c.resources[3] >= 75 {
 		c.icons[3].image = c.imgs[3]
-	} else if c.power >= 50 {
+	} else if c.resources[3] >= 50 {
 		c.icons[3].image = c.imgs[7]
 	} else {
 		c.icons[3].image = c.imgs[11]
@@ -100,31 +103,32 @@ func (c *City) MonitorResources() {
 
 func (c *City) UpdateResources() {
 	if time.Since(c.waterTime) >= 10*time.Second {
-		c.water = c.water - 5
-		c.KeepInBounds(c.water)
+		c.resources[0] = c.resources[0] - 5
+		c.KeepInBounds(0)
 		c.waterTime = time.Now()
 		c.UpdateLogs("water", "down")
+
 	}
 
 	if time.Since(c.foodTime) >= 20*time.Second {
-		c.food = c.food - 5
-		c.KeepInBounds(c.food)
+		c.resources[1] = c.resources[1] - 5
+		c.KeepInBounds(1)
 		c.foodTime = time.Now()
 		c.UpdateLogs("food", "down")
 
 	}
 
-	if time.Since(c.oxygenTime) >= 1*time.Second {
-		c.oxygen = c.oxygen - 5
-		c.KeepInBounds(c.oxygen)
+	if time.Since(c.oxygenTime) >= 6*time.Second {
+		c.resources[2] = c.resources[2] - 5
+		c.KeepInBounds(2)
 		c.oxygenTime = time.Now()
 		c.UpdateLogs("oxygen", "down")
 
 	}
 
 	if time.Since(c.powerTime) >= 20*time.Second {
-		c.power = c.power - 5
-		c.KeepInBounds(c.power)
+		c.resources[3] = c.resources[3] - 5
+		c.KeepInBounds(3)
 		c.powerTime = time.Now()
 		c.UpdateLogs("power", "down")
 
@@ -142,21 +146,26 @@ func (c *City) UpdateResources() {
 	c.CheckOperator()
 }
 
-func (c *City) KeepInBounds(resource float32) {
-	if resource < 0 {
-		resource = 0
-	} else if resource > 100 {
-		resource = 100
+func (c *City) KeepInBounds(resourceIdx int) {
+	if c.resources[resourceIdx] <= 0 {
+		c.resources[resourceIdx] = 0
+	} else if c.resources[resourceIdx] >= 100 {
+		c.resources[resourceIdx] = 100
 	}
 }
 
 func (c *City) CheckOperator() {
-	if time.Since(c.operatorTime) >= 30*time.Second {
+	if time.Since(c.operatorTime) >= 30*time.Second && c.operatorStatus {
 		c.operatorStatus = false
 		c.operatorTime = time.Now()
 		c.logs = append(c.logs, "check on operator")
 	}
-	c.icons[4].Update()
+	//if time.Since(c.operatorTime) >= 30*time.Second && !c.operatorStatus {
+	//	currentState = StateExit
+
+	//}
+
+	c.icons[5].Update()
 }
 
 func (c *City) ShowDashboards(screen *ebiten.Image) {
@@ -167,7 +176,17 @@ func (c *City) ShowDashboards(screen *ebiten.Image) {
 		c.windows[2].Draw(screen)
 		c.windows[3].Draw(screen)
 
+		c.buttons[1].Draw(screen)
+		c.buttons[2].Draw(screen)
+		c.buttons[3].Draw(screen)
+
 		DisplayText(c.windows[1].x+c.windows[1].image.Bounds().Dx()/2-len(c.currentResource)*9, c.windows[1].y+60, 36, c.currentResource, screen, color.White)
+		msg := fmt.Sprintf("%.2f", c.resources[c.resourceDescriptionIdx])
+		DisplayText(c.windows[2].x+c.windows[2].image.Bounds().Dx()/2-len(msg)*9, c.windows[2].y+60, 36, msg, screen, color.White)
+
+		DisplayText(c.windows[2].x+c.windows[2].image.Bounds().Dx()/2-len("Quality of living")*8, c.windows[2].y+150, 36, "Quality of living", screen, color.White)
+		msg = fmt.Sprintf("%.2f", c.qualityOfLiving)
+		DisplayText(c.windows[2].x+c.windows[2].image.Bounds().Dx()/2-len(msg)*9, c.windows[2].y+200, 36, msg, screen, color.White)
 
 		xPos := c.windows[1].x + 5 + (c.imgs[16].Bounds().Dx()-c.imgs[c.currentResourceIdx].Bounds().Dx())/2
 		PlaceImg(xPos, 370, c.imgs[c.currentResourceIdx], screen)
@@ -212,13 +231,15 @@ func (c *City) ShowLogs(screen *ebiten.Image) {
 
 func (c *City) UpdateLogs(resource, status string) {
 	if status == "up" {
-		c.logs = append(c.logs, string(resource)+" was added")
+		c.logs = append(c.logs, resource+" was added")
 	} else if status == "down" {
-		c.logs = append(c.logs, string(resource)+" decreased")
+		c.logs = append(c.logs, resource+" decreased")
 	}
 }
 
 func (c *City) CreateButtons() {
+
+	// city main screen related
 	waterIcon := &Button{
 		image: c.imgs[0],
 		x:     50,
@@ -268,10 +289,19 @@ func (c *City) CreateButtons() {
 	}
 
 	operatorIcon := &Button{
-		image:   c.imgs[12],
-		x:       450,
-		y:       20,
-		onClick: func() { c.operatorStatus = true },
+		image: c.imgs[12],
+		x:     450,
+		y:     20,
+		onClick: func() {
+			c.operatorStatus = true
+			c.logs = append(c.logs, "operator presence confirmed")
+		},
+	}
+
+	qolIcon := &Button{
+		image: c.imgs[22],
+		x:     950,
+		y:     35,
 	}
 
 	c.waterTime = time.Now()
@@ -280,8 +310,9 @@ func (c *City) CreateButtons() {
 	c.powerTime = time.Now()
 	c.operatorTime = time.Now()
 
-	c.icons = append(c.icons, waterIcon, foodIcon, oxygenIcon, powerIcon, operatorIcon)
+	c.icons = append(c.icons, waterIcon, foodIcon, oxygenIcon, powerIcon, qolIcon, operatorIcon)
 
+	// log related
 	logButton := &Button{
 		image:   c.imgs[13],
 		x:       (WIDTH - c.imgs[13].Bounds().Dx()) / 2,
@@ -296,6 +327,7 @@ func (c *City) CreateButtons() {
 		y:     HEIGHT / 4,
 	}
 
+	// dashboard related
 	dashboard1 := &Button{
 		image: c.imgs[17],
 		x:     (WIDTH - c.imgs[16].Bounds().Dx()) / 6,
@@ -314,7 +346,49 @@ func (c *City) CreateButtons() {
 		y:     c.imgs[16].Bounds().Dy(),
 	}
 
-	c.buttons = append(c.buttons, logButton)
+	actionButton1 := &Button{
+		image: c.imgs[13],
+		x:     (WIDTH/2 + 10) + (c.imgs[16].Bounds().Dx()-c.imgs[13].Bounds().Dx())/2,
+		y:     c.imgs[16].Bounds().Dy() + 75,
+		text:  "Smaller rations",
+		onClick: func() {
+			c.resources[c.resourceDescriptionIdx] += 10
+			c.KeepInBounds(c.resourceDescriptionIdx)
+
+			c.UpdateLogs(c.currentResource, "up")
+			c.qualityOfLiving -= 5
+		},
+	}
+
+	actionButton2 := &Button{
+		image: c.imgs[13],
+		x:     (WIDTH/2 + 10) + (c.imgs[16].Bounds().Dx()-c.imgs[13].Bounds().Dx())/2,
+		y:     c.imgs[16].Bounds().Dy() + 175,
+		text:  "Gather from facility",
+		onClick: func() {
+			c.resources[c.resourceDescriptionIdx] += 5
+			c.KeepInBounds(c.resourceDescriptionIdx)
+
+			c.UpdateLogs(c.currentResource, "up")
+			c.qualityOfLiving += 5
+		},
+	}
+
+	actionButton3 := &Button{
+		image: c.imgs[13],
+		x:     (WIDTH/2 + 10) + (c.imgs[16].Bounds().Dx()-c.imgs[13].Bounds().Dx())/2,
+		y:     c.imgs[16].Bounds().Dy() + 275,
+		text:  "Temporary labour",
+		onClick: func() {
+			c.resources[c.resourceDescriptionIdx] += 5
+			c.KeepInBounds(c.resourceDescriptionIdx)
+			c.UpdateLogs(c.currentResource, "up")
+			c.qualityOfLiving -= 10
+
+		},
+	}
+
+	c.buttons = append(c.buttons, logButton, actionButton1, actionButton2, actionButton3)
 	c.windows = append(c.windows, logWindow, dashboard1, dashboard2, dashboard3)
 }
 
@@ -340,6 +414,9 @@ func (c *City) LoadImgs() {
 	// appears everytime oxygen changes status
 	operatorImg, _, _ := ebitenutil.NewImageFromFile(ICON13)
 
+	// quality of life icon
+	qolImg, _, _ := ebitenutil.NewImageFromFile(ICON14)
+
 	// buttons
 	logImg := ResizeImg(BUTTON4, 260, 52)
 	logImg2 := ResizeImg(BUTTON5, 260, 52)
@@ -363,7 +440,8 @@ func (c *City) LoadImgs() {
 		waterImgB, foodImgB, oxygenImgB, powerImgB,
 		operatorImg, logImg, logImg2, logWindowImg,
 		dashboardImg1, dashboardImg2,
-		resourceImg1, resourceImg2, resourceImg3, resourceImg4)
+		resourceImg1, resourceImg2, resourceImg3, resourceImg4,
+		qolImg)
 }
 
 func (c *City) GetResourceDescription() {

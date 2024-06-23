@@ -5,7 +5,7 @@ const WIDTH, HEIGHT = 1024, 750
 const TPS = 60
 
 // imgs
-const BG = "interface/assets/bg.jpg"
+const BG = "interface/assets/main.jpg"
 const CITY = "interface/assets/city.jpg"
 const GARDENS = "interface/assets/gardens.jpg"
 const REACTOR = "interface/assets/reactor.jpg"
@@ -35,6 +35,7 @@ const ICON11 = "interface/assets/in use/IconD03.png"
 const ICON12 = "interface/assets/in use/IconD05.png"
 
 const ICON13 = "interface/assets/in use/Icon28.png"
+const ICON14 = "interface/assets/in use/Icon02.png"
 
 // resources imgs
 const IMG1 = "interface/assets/in use/water.jpg"
@@ -58,6 +59,3 @@ const (
 	StateTransportation
 	StateExit
 )
-
-// data json
-const JSONPATH = "data/resource.json"

@@ -18,7 +18,7 @@ type Window struct {
 
 func (w *Window) Init() {
 	w.background, _, _ = ebitenutil.NewImageFromFile(BG)
-	buttonImg, _, _ := ebitenutil.NewImageFromFile(BUTTON1)
+	buttonImg := ResizeImg(BUTTON4, 260, 60)
 	buttonImgLeft, _, _ := ebitenutil.NewImageFromFile(BUTTON2)
 	buttonImgRight, _, _ := ebitenutil.NewImageFromFile(BUTTON3)
 	cityImg, _, _ := ebitenutil.NewImageFromFile(CITY)
@@ -63,6 +63,7 @@ func (w *Window) Init() {
 
 	w.buttons = append(w.buttons, startButton, exitButton, leftButton, rightButton)
 
+	// gpu, temp := GetSystemData()
 	city := &City{
 		bg:              cityImg,
 		water:           100,
