@@ -8,9 +8,9 @@ In the City, you have access to:
 - Report Window: View detailed reports about the colony.
 - Resource Overviews: Monitor the status of four essential resources (water, food, oxygen, power) along with options to increase their values.
 - Player Presence Check: A button that checks for the player's presence every 30 seconds.
-![c1](https://github.com/agkittens/survive-mars/blob/main/examples/2.PNG?raw=true)
-![c2](https://github.com/agkittens/survive-mars/blob/main/examples/3.PNG?raw=true)
-![c4](https://github.com/agkittens/survive-mars/blob/main/examples/4.PNG?raw=true)
+![c1](https://github.com/agkittens/survive-mars/blob/main/examples/2.jpg?raw=true)
+![c2](https://github.com/agkittens/survive-mars/blob/main/examples/3.jpg?raw=true)
+![c4](https://github.com/agkittens/survive-mars/blob/main/examples/4.jpg?raw=true)
 
 ### Gardens
 In the Gardens, you can:
