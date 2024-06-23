@@ -77,6 +77,8 @@ func (w *Window) Init() {
 	gardens := &Gardens{
 		bg: gardensImg,
 	}
+	gardens.Init()
+
 	reactor := &Reactor{
 		bg: reactorImg,
 	}
@@ -105,6 +107,9 @@ func (w *Window) Update() error {
 	case StateGardens:
 		w.buttons[3].onClick = func() { currentState = StateCity }
 		w.buttons[3].Update()
+		if gardens, ok := w.gameLogic[1].(*Gardens); ok {
+			gardens.Update()
+		}
 
 	case StateReactor:
 		w.buttons[2].onClick = func() { currentState = StateTransportation }

@@ -37,6 +37,9 @@ const ICON12 = "interface/assets/in use/IconD05.png"
 const ICON13 = "interface/assets/in use/Icon28.png"
 const ICON14 = "interface/assets/in use/Icon02.png"
 
+// gardens
+const ICON15 = "interface/assets/in use/Icon23.png"
+
 // resources imgs
 const IMG1 = "interface/assets/in use/water.jpg"
 const IMG2 = "interface/assets/in use/food.jpg"
@@ -49,6 +52,9 @@ const LOG_WINDOW = "interface/assets/in use/Card X2.png"
 // dashboards
 const DASHBOARD1 = "interface/assets/in use/Card X3.png"
 const DASHBOARD2 = "interface/assets/in use/Card X1.png"
+
+// plants
+const PLANTS = "interface/assets/in use/plants.jpg"
 
 // window
 const (
